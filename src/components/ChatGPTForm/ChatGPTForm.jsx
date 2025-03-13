@@ -75,12 +75,34 @@ const ResultTitle = styled.h3`
   margin-bottom: 15px;
 `;
 
+const ButtonGroup = styled.div`
+  display: flex;
+  gap: 10px;
+  margin-bottom: 20px;
+  justify-content: center;
+`;
+
+const TypeButton = styled.button`
+  padding: 8px 16px;
+  border: 2px solid #3498db;
+  border-radius: 4px;
+  background-color: ${props => props.$active ? '#3498db' : 'white'};
+  color: ${props => props.$active ? 'white' : '#3498db'};
+  cursor: pointer;
+  transition: all 0.2s;
+
+  &:hover {
+    background-color: ${props => props.$active ? '#2980b9' : '#f0f7fc'};
+  }
+`;
+
 function ChatGPTForm() {
   const [inputText, setInputText] = useState("");
   const [improvedText, setImprovedText] = useState("");
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
   const [lastRequestTime, setLastRequestTime] = useState(0);
+  const [requestType, setRequestType] = useState("adressage");
 
   const handleSubmit = async () => {
     const now = Date.now();
@@ -94,7 +116,17 @@ function ChatGPTForm() {
     setError("");
     setImprovedText("");
 
-    const response = await improveText(inputText, import.meta.env.VITE_OPENAI_API_KEY);
+    const systemMessage = requestType === "adressage" 
+      ? `Tu es un assistant spécialisé en rédaction médicale. Ton rôle est de rédiger une lettre d'adressage entre médecins, 
+        en veillant à ce que le ton reste formel, professionnel et respectueux. Ton objectif est d'améliorer le texte sur le plan
+        stylistique, tout en préservant la précision des informations médicales.`
+      : 
+      `Tu es un assistant spécialisé dans la création de bilans de santé destinés à un médecin. Ton objectif est de rédiger un bilan 
+      de santé clair, concis et structuré, en incluant toutes les informations pertinentes qui permettront au patient de comprendre 
+      ses résultats et de savoir quels examens complémentaires ou actions supplémentaires sont nécessaires. Le ton doit être professionnel, 
+      rassurant et informatif, et les instructions doivent être facilement compréhensibles pour un patient sans formation médicale.`;
+
+    const response = await improveText(inputText, import.meta.env.VITE_OPENAI_API_KEY, systemMessage);
     
     if (!response.success) {
       setError(response.error);
@@ -111,16 +143,31 @@ function ChatGPTForm() {
 
   return (
     <FormContainer>
-      <Title>Améliorer une lettre d'adressage médicale</Title>
+      <Title>Améliorer une lettre médicale</Title>
 
-    <Box $width="100%">
+      <ButtonGroup>
+        <TypeButton 
+          $active={requestType === "adressage"}
+          onClick={() => setRequestType("adressage")}
+        >
+          Lettre d'adressage
+        </TypeButton>
+        <TypeButton 
+          $active={requestType === "bilan"}
+          onClick={() => setRequestType("bilan")}
+        >
+          Demande de bilan
+        </TypeButton>
+      </ButtonGroup>
+
+      <Box $width="100%">
         <TextArea
             rows={10}
             placeholder="Collez ici la lettre à améliorer..."
             value={inputText}
             onChange={(e) => setInputText(e.target.value)}
         />
-    </Box>
+      </Box>
 
       <div>
         <Button onClick={handleSubmit} disabled={loading}>
