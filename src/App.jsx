@@ -32,7 +32,7 @@ function App() {
     <AppContainer>
       <ToastContainer />
       <Header>
-        <Box style={{position:'absolute'}} top="0" left="0">
+        <Box style={{}} top="0" left="0">
           <img src={LogoRecovv} alt="Logo"  style={{width: '100px'}}/>
         </Box>
         <Box $flex $justifycenter style={{position: 'relative'}}>

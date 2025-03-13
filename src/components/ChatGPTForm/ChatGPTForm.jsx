@@ -6,7 +6,7 @@ import { improveText } from "../../api/openai";
 
 const FormContainer = styled.div`
   max-width: 800px;
-  width: 100%;
+  width: 80%;
   margin: 20px auto;
   padding: 20px;
   background-color: #f8f9fa;
